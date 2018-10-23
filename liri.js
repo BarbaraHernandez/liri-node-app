@@ -1,12 +1,15 @@
 require("dotenv").config();
 
+require("moment").config();
+
 var request = require("request");
 
 var keys = require("keys.js").config();
 
-var spotify = require("node-spotify-api");
+var Spotify = require("node-spotify-api");
 
 var input = process.argv[4];
+var command = process.argv[3];
 
 
 //movies
@@ -54,29 +57,43 @@ function getConcert (input){
   console.log(concert);
 }
 
-getConcert();
-
 //spotify pieces
+//not working
 
-function getSpotify(song){
-  if(song === undefined || song === " "){
-    song === 'The Sign'
-  };
+function getSpotify(input){
+  spotify
+    .search({ 
+      type: 'track', 
+      query: input }, 
+      function(err, data) {
+        if (err) {
+          return console.log('Error occurred: ' + err);
+        }
+      })
+    .then(function(response){
+      console.log(response);
+    })
 
-  spotify.search();
 }
-
 
 //movie pieces
 
 
 
 //switch function based on commands
-
-//concert-this
-
-//spotify-this-song
-
-//movie-this
-
-//do-what-it-says
+switch(command){
+  case "spotify-this":
+    getSpotify();
+    break;
+  case "concert-this":
+    getConcert();
+    break;
+  case "movie-this":
+    getMovie();
+    break;
+  case "do-what-it-says":
+    getRandom();
+    break;
+  default:
+    console.log("Sorry, I don't recognize that command.");
+}
