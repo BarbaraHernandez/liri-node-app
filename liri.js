@@ -49,14 +49,10 @@ function getConcert() {
 
     })
 
-  }
+}
   
 
-
-
 //spotify pieces
-
-
 
 function getSpotify(){
   console.log("input: " + input);
@@ -88,7 +84,45 @@ function getSpotify(){
 }
 
 //movie pieces
+//not able to get data from JSON here
+function getMovie() {
+  input = process.argv.slice(3).join("+");
+  var movieURL = "http://www.omdbapi.com/?apikey=trilogy&t=" + input;
 
+  request(movieURL, function(err, response, body){
+    
+    var jsonMovie = JSON.parse(body);
+    
+    if (!jsonMovie || jsonMovie.length == 0){
+      console.log("sorry, no results");
+    }
+
+  
+    var movieData = (
+      "Title: " + jsonMovie.Title +
+      "\nRelease: " + jsonMovie.Year +
+      "\nRating: " + jsonMovie.Rated +
+      //this was inside of an array and I wasn't sure how to get it
+      // "\nRotten Tomatoes Score: " + jsonMovie.Ratings.Source.RottenTomatoes.Value +
+      "\nCountry: " + jsonMovie.Country +
+      "\nLangugage: " + jsonMovie.Language + 
+      "\nActors: " + jsonMovie.Actors +
+      "\nPlot: " + jsonMovie.Plot 
+    );
+      
+    //print 
+    console.log(movieData);
+    
+
+  })
+
+}
+
+//random
+
+function getRandom(){
+  fs.readfile(random.txt);
+}
 
 
 //switch function based on commands
