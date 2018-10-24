@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-require("moment");
+var moment = require("moment");
 
 var request = require("request");
 
@@ -12,11 +12,6 @@ var spotify = new Spotify(keys.spotify);
 
 var input = process.argv.slice(3).join(" ");
 var command = process.argv[2];
-
-console.log("argv" + process.argv);
-console.log("slice" + process.argv.slice(3));
-console.log("join" + input);
-
 var fs = require("fs");
 
 
@@ -24,40 +19,44 @@ var fs = require("fs");
 //command functions
 
 //concert-this pieces
-//not working
 
-var Concert = function() {
-  //API request
-  this.getConcert = function(artist) {
-    var bandURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+function getConcert() {
+
+    var bandURL = "https://rest.bandsintown.com/artists/" + input + "/events?app_id=codingbootcamp";
 
     request(bandURL, function(err, response, body){
+      
       var jsonConcert = JSON.parse(body);
+      
+      if (!jsonConcert || jsonConcert.length == 0){
+        console.log("sorry, no results");
+      }
 
-      var momentDate = moment(jsonConcert.datetime).format(L);
-      
-      //contains data to print
-      var concertData = [
-        "Venue: " + jsonConcert.venue.name,
-        "\nLocation: " + jsonConcert.venue.city + " " + jsonConcert.venue.region,
-        "\nDate: " + momentDate
-      ]
-      
-      //print 
-      console.log(concertData);
+      for (var i=0; i < jsonConcert.length; i++){    
+        var momentDate = moment(jsonConcert[i].datetime).format("MM/DD/YYYY");
+        
+        //contains data to print
+        var concertData = (
+          "Venue: " + jsonConcert[i].venue.name +
+          "\nLocation: " + jsonConcert[i].venue.city + " " + jsonConcert[i].venue.region +
+          "\nDate: " + momentDate +
+          "\n-------------"
+        )
+        
+        //print 
+        console.log(concertData);
+      }
 
     })
 
   }
   
-}
 
-var concert = new Concert();
+
 
 //spotify pieces
 
-// var artistArr = tracks[i].album.artists
-//not working
+
 
 function getSpotify(){
   console.log("input: " + input);
@@ -70,8 +69,9 @@ function getSpotify(){
           return console.log('Error occurred: ' + err);
         }
         var tracks = data.tracks.items;
+        // var artistArr = tracks[i].album.artists
         for (var i=0; i < 5; i++){
-          console.log("Artist: " + tracks[i].artists);
+          console.log("Artist: " + tracks[i].artists);//struggled with this
 
           //not working
           // for (var x=0; x < artistArr.length; x++) {
@@ -97,7 +97,7 @@ switch(command){
     getSpotify();
     break;
   case "concert-this":
-    concert.getConcert();
+    getConcert();
     break;
   case "movie-this":
     getMovie();
