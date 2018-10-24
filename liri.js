@@ -1,66 +1,66 @@
 require("dotenv").config();
 
-require("moment").config();
+require("moment");
 
 var request = require("request");
 
-var keys = require("keys.js").config();
+var keys = require("./keys");
 
 var Spotify = require("node-spotify-api");
 
-var input = process.argv[4];
-var command = process.argv[3];
+var spotify = new Spotify(keys.spotify);
 
+var input = process.argv.slice(3).join(" ");
+var command = process.argv[2];
 
-//movies
-
-//request data
-// example
-// request('http://www.google.com', function (error, response, body) {
-//   console.log('error:', error); // Print the error if one occurred
-//   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-//   console.log('body:', body); // Print the HTML for the Google homepage.
-// });
-
-//console
-
-
+console.log("argv" + process.argv);
+console.log("slice" + process.argv.slice(3));
+console.log("join" + input);
 
 var fs = require("fs");
-//require packages
-//--movie this: omdb
 
 
-//functions
-//concert-this -- all pieces
-//API query
-var bandsURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
 
-function bandQuery(artist) = request(bandsURL, function(error, response){
-  if(error){
-    console.log("error: " + error);
-  }else{
-    var bandResponse = response.stringify;
-  }
-})
+//command functions
 
-//concert object
-function ConcertInfo (bandResponse){
-    console.log(bandResponse);
-}
-
-function getConcert (input){
-  var artist = input;
-  //get info
-  bandQuery();
-  //output
-  console.log(concert);
-}
-
-//spotify pieces
+//concert-this pieces
 //not working
 
-function getSpotify(input){
+var Concert = function() {
+  //API request
+  this.getConcert = function(artist) {
+    var bandURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+
+    request(bandURL, function(err, response, body){
+      var jsonConcert = JSON.parse(body);
+
+      var momentDate = moment(jsonConcert.datetime).format(L);
+      
+      //contains data to print
+      var concertData = [
+        "Venue: " + jsonConcert.venue.name,
+        "\nLocation: " + jsonConcert.venue.city + " " + jsonConcert.venue.region,
+        "\nDate: " + momentDate
+      ]
+      
+      //print 
+      console.log(concertData);
+
+    })
+
+  }
+  
+}
+
+var concert = new Concert();
+
+//spotify pieces
+
+// var artistArr = tracks[i].album.artists
+//not working
+
+function getSpotify(){
+  console.log("input: " + input);
   spotify
     .search({ 
       type: 'track', 
@@ -69,10 +69,21 @@ function getSpotify(input){
         if (err) {
           return console.log('Error occurred: ' + err);
         }
-      })
-    .then(function(response){
-      console.log(response);
-    })
+        var tracks = data.tracks.items;
+        for (var i=0; i < 5; i++){
+          console.log("Artist: " + tracks[i].artists);
+
+          //not working
+          // for (var x=0; x < artistArr.length; x++) {
+          //   console.log(artistArr[x] + ", ");
+          // }
+          console.log("song: " + tracks[i].name);
+          console.log("Preview URL: " + tracks[i].preview_url);
+          console.log("Album: " + tracks[i].album.name);
+          console.log("---------------");
+        }
+      });
+
 
 }
 
@@ -86,7 +97,7 @@ switch(command){
     getSpotify();
     break;
   case "concert-this":
-    getConcert();
+    concert.getConcert();
     break;
   case "movie-this":
     getMovie();
